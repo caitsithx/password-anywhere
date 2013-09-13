@@ -92,15 +92,18 @@ public final class XMLManager {
 	public void act(Element p_element) throws Exception;
    }
    
-   public static int iterateChildren(Element p_element, String p_name, Action p_elementAction) throws Exception{
+   public static int iterateChildren(Element p_element, String p_name, String p_NS, Action p_elementAction) throws Exception{
 	int l_count = 0;
 	
 	NodeList l_childList = p_element.getChildNodes();
 	for(int i = 0; i < l_childList.getLength(); i ++){
 	   Node l_child = l_childList.item(i);
 	   if(l_child.getNodeType() == Node.ELEMENT_NODE){
-		if(l_child.getNodeName().equals(p_name)){
+		Element l_element = ((Element)l_child);
+		if(l_element.getNodeName().equals(p_name) 
+			&& (p_NS == null || p_NS.equals(l_element.getNamespaceURI()))){
 		   l_count++;
+		   
 		   p_elementAction.act((Element)l_child);
 		}
 	   }

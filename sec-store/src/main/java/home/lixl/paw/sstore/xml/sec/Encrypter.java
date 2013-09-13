@@ -19,20 +19,15 @@
 package home.lixl.paw.sstore.xml.sec;
 
 import home.lixl.paw.sstore.xml.XmlSecureStoreException;
+import home.lixl.paw.sstore.xml.impl.CipherWrapper;
 import home.lixl.paw.sstore.xml.util.XMLManager;
 
-import java.nio.charset.Charset;
-import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESedeKeySpec;
 
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
@@ -69,32 +64,12 @@ public class Encrypter {
     * @param p_decXmlDocument
     * 
     */
-   public Document encrypt(byte[] p_key, Document p_decXmlDocument) {
+   public Document encrypt(char[] p_key, Document p_decXmlDocument) {
 	return null;
    }
 
-   private SecretKey getKey(char[] p_key) throws InvalidKeyException,
-	   NoSuchAlgorithmException, InvalidKeySpecException {
-	Charset utf8 = Charset.forName("UTF8");
-	byte[] l_passBytes = utf8.encode(new String(p_key)).array();
+   CipherWrapper cipherWrapper = new CipherWrapper();
 
-	byte[] l_keyBytes = new byte[24];
-
-	if (l_passBytes.length > l_keyBytes.length) {
-	   System.arraycopy(l_passBytes, 0, l_keyBytes, 0, l_keyBytes.length);
-	} else {
-	   System.arraycopy(l_passBytes, 0, l_keyBytes, 0, l_passBytes.length);
-	   if (l_passBytes.length < l_keyBytes.length) {
-		Arrays.fill(l_keyBytes, l_passBytes.length, l_keyBytes.length, (byte) 0x0F);		
-	   }
-	}
-
-	DESedeKeySpec keySpec = new DESedeKeySpec(l_keyBytes);
-	SecretKeyFactory skf = SecretKeyFactory.getInstance("DESede");
-	SecretKey key = skf.generateSecret(keySpec);
-
-	return key;
-   }
 
    /**
     * @param p_key
@@ -105,51 +80,55 @@ public class Encrypter {
     */
    public void encryptAllWithNewKey(char[] p_key, final Document p_decXmlDocument) throws XmlSecureStoreException {
 	try {
-	   
-	/*
-	 * Get a key to be used for encrypting the element. Here we are generating
-	 * an AES key.
-	 */
-	Key symmetricKey = GenerateDataEncryptionKey();
 
-	/*
-	 * Get a key to be used for encrypting the symmetric key. Here we are
-	 * generating a DESede key.
-	 */
-	Key kek = getKey(p_key);
+	   /*
+	    * Get a key to be used for encrypting the element. Here we are generating
+	    * an AES key.
+	    */
+	   Key symmetricKey = GenerateDataEncryptionKey();
 
-	EncryptedKey encryptedKey = encryptDataKey(kek, symmetricKey, p_decXmlDocument);
-	
+	   /*
+	    * Get a key to be used for encrypting the symmetric key. Here we are
+	    * generating a DESede key.
+	    */
+	   Key kek = cipherWrapper.getKey(p_key);
 
-	/*
-	 * Let us encrypt the contents of the document element.
-	 */
-	String algorithmURI = XMLCipher.AES_128;
-	final XMLCipher xmlCipher = XMLCipher.getInstance(algorithmURI);
-	xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+	   EncryptedKey encryptedKey = encryptDataKey(kek, symmetricKey, p_decXmlDocument);
 
-	/*
-	 * Setting keyinfo inside the encrypted data being prepared.
-	 */
-	Element rootElement = p_decXmlDocument.getDocumentElement();
-	EncryptedData encryptedData = xmlCipher.getEncryptedData();
-	KeyInfo keyInfo = new KeyInfo(p_decXmlDocument);
-	keyInfo.add(encryptedKey);
-	encryptedData.setKeyInfo(keyInfo);
-	
 
-	searchAndEncPairs(rootElement, new XMLManager.Action(){
+	   /*
+	    * Let us encrypt the contents of the document element.
+	    */
+	   String algorithmURI = XMLCipher.AES_128;
+	   final XMLCipher xmlCipher = XMLCipher.getInstance(algorithmURI);
+	   xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
 
-	   @Override
-	   public void act(Element p_element) throws Exception {
-		/*
-		 * doFinal - "true" below indicates that we want to encrypt element's
-		 * content and not the element itself. Also, the doFinal method would
-		 * modify the document by replacing the EncrypteData element for the data
-		 * to be encrypted.
-		 */
-		xmlCipher.doFinal(p_decXmlDocument, p_element, true);
-	   }});
+	   /*
+	    * Setting keyinfo inside the encrypted data being prepared.
+	    */
+	   Element rootElement = p_decXmlDocument.getDocumentElement();
+	   EncryptedData encryptedData = xmlCipher.getEncryptedData();
+	   KeyInfo keyInfo = new KeyInfo(p_decXmlDocument);
+	   keyInfo.add(encryptedKey);
+	   encryptedData.setKeyInfo(keyInfo);
+
+
+
+	   List<Element> l_folderElements = XMLManager.searchChildren(rootElement, "folder");
+	   for (Element l_folderElement : l_folderElements) {
+		searchAndEncPairs(l_folderElement, new XMLManager.Action(){
+
+		   @Override
+		   public void act(Element p_element) throws Exception {
+			/*
+			 * doFinal - "true" below indicates that we want to encrypt element's
+			 * content and not the element itself. Also, the doFinal method would
+			 * modify the document by replacing the EncrypteData element for the data
+			 * to be encrypted.
+			 */
+			xmlCipher.doFinal(p_decXmlDocument, p_element, true);
+		   }});
+	   }
 	} catch (Exception l_ex) {
 	   throw new XmlSecureStoreException(l_ex);
 	}
@@ -167,6 +146,7 @@ public class Encrypter {
 	String algorithmURI = XMLCipher.TRIPLEDES_KeyWrap;
 	XMLCipher keyCipher = XMLCipher.getInstance(algorithmURI);
 	keyCipher.init(XMLCipher.WRAP_MODE, p_kek);
+
 	return keyCipher.encryptKey(p_decXmlDocument,
 		p_symmetricKey);
    }
@@ -174,25 +154,21 @@ public class Encrypter {
    /**
     * @param p_decXmlDocument 
     * @param p_xmlCipher 
-    * @param p_rootElement
+    * @param p_folderElement
     * @throws Exception 
     * 
     */
-   private void searchAndEncPairs(Element p_rootElement, XMLManager.Action p_encAction) throws Exception {
-	
-	List<Element> l_folderElements = XMLManager.searchChildren(p_rootElement, "folder");
-	
-	for (Element l_folderElement : l_folderElements) {
-	   int l_count = XMLManager.iterateChildren(l_folderElement, "pair", p_encAction);
-	   
-	   if(l_count == 0) {
-		List<Element> l_subfolderElements = XMLManager.searchChildren(l_folderElement, "folder");
-		
-		for (Element l_subFolderElement : l_subfolderElements) {
-		   searchAndEncPairs(l_subFolderElement, p_encAction);
-		}
-	   } 
+   private void searchAndEncPairs(Element p_folderElement, XMLManager.Action p_encAction) throws Exception {
+	int l_pairCount = XMLManager.countChildren(p_folderElement, "pair");
+
+	if(l_pairCount > 0) {
+	   p_encAction.act(p_folderElement);
+	} else {
+	   List<Element> l_folderElements = XMLManager.searchChildren(p_folderElement, "folder");
+
+	   for (Element l_folderElement : l_folderElements) {
+		searchAndEncPairs(l_folderElement, p_encAction);
+	   }
 	}
-	
    }
 }

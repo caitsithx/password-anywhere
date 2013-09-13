@@ -31,11 +31,14 @@ import org.xml.sax.InputSource;
  */
 public class XmlSecureStoreImpl implements SecStore{
 
-   private StorageKeyKeeper storeKeyKeeper;
-   private StoreSourceProvider storeSourceProvider;
-   
-   private Document l_encXmlDocument;
+   private StorageKeyKeeper storeKeyKeeper = null;
+   private StoreSourceProvider storeSourceProvider = null;
 
+   /**
+    * @param p_storeKeyKeeper
+    * @param p_storeSourceProvider
+    * 
+    */
    public void init(StorageKeyKeeper p_storeKeyKeeper, StoreSourceProvider p_storeSourceProvider) {
 	storeKeyKeeper = p_storeKeyKeeper;
 	storeSourceProvider = p_storeSourceProvider;
@@ -45,64 +48,54 @@ public class XmlSecureStoreImpl implements SecStore{
     * @see home.lixl.paw.sstore.SecStore#createNew(home.lixl.paw.sstore.xml.plain.SecureStore, byte[], java.lang.String)
     */
    @Override
-   public void createNew(SecureStore p_data, char[] p_password,
-	   String p_fileLocation) throws XmlSecureStoreException {
+   public void createNew(SecureStore p_data) throws XmlSecureStoreException {
 	Encrypter l_encrypter = new Encrypter();
-	storeKeyKeeper.putKey(p_password);
-	
+	Document l_decXmlDocument = null;
 	try {
-	Document l_decXmlDocument = JaxbHandler.writeJAXB(p_data);
-	l_encrypter.encryptAllWithNewKey(p_password, l_decXmlDocument);
-	l_encXmlDocument = l_decXmlDocument;
+	   l_decXmlDocument = JaxbHandler.writeJAXB(p_data);
+	   l_encrypter.encryptAllWithNewKey(storeKeyKeeper.getKey(), l_decXmlDocument);
 	} catch(JAXBException ex) {
 	   throw new XmlSecureStoreException(ex);
 	}
-	
-	storeSourceProvider.newFileSource(p_fileLocation);
-	XMLManager.write(l_encXmlDocument, storeSourceProvider.getOutput(), null);
+
+	XMLManager.write(l_decXmlDocument, storeSourceProvider.getOutput(), null);
    }
-   
+
    @Override
-   public void open() throws XmlSecureStoreException {
+   public Document open() throws XmlSecureStoreException {
 	InputSource l_input = storeSourceProvider.getInput();
-	
-	l_encXmlDocument = XMLManager.load(l_input, null);
+	return XMLManager.load(l_input, null);
    }
-   
-   public SecureStore list() throws JAXBException {
+
+   public SecureStore list() throws XmlSecureStoreException {
+	Document l_document = open();
 	char[] l_key = storeKeyKeeper.getKey();
-	
+
 	Decrypter l_decrypter = new Decrypter();
-	Document l_decXmlDocument = l_decrypter.decryptAll(l_key, l_encXmlDocument);
-	
-	return JaxbHandler.loadJAXB(l_decXmlDocument);
+	try {
+	   l_decrypter.decryptAll(l_key, l_document);
+	   return JaxbHandler.loadJAXB(l_document);
+	} catch(JAXBException ex) {
+	   throw new XmlSecureStoreException(ex);
+	} catch (Exception ex) {
+	   throw new XmlSecureStoreException(ex);
+	}
    }
-   
-   public void write(SecureStore p_secStore) throws JAXBException, XmlSecureStoreException {
-	char[] l_key = storeKeyKeeper.getKey();
-	
-	Encrypter l_decrypter = new Encrypter();
-	Document l_decXmlDocument = JaxbHandler.writeJAXB(p_secStore);
-	
-	l_encXmlDocument = l_decrypter.encrypt(l_key, l_decXmlDocument);
-	
-	XMLManager.write(l_encXmlDocument, storeSourceProvider.getOutput(), null);
-   }
-   
+
    public void UpdateFolder(ReadWriteAccessAction p_action) throws XmlSecureStoreException {
+	Document l_document = open();
 	char[] l_key = storeKeyKeeper.getKey();
 	Decrypter l_decrypter = new Decrypter();
-	Document l_decXmlDocument = l_decrypter.decrypt(l_key, l_encXmlDocument);
-	
+	Document l_decXmlDocument = l_decrypter.decrypt(l_key, l_document);
+
 	//find the folder using xpath
-	
-	l_encXmlDocument = null;
-	
-	XMLManager.write(l_encXmlDocument, storeSourceProvider.getOutput(), null);
+
+
+	XMLManager.write(l_document, storeSourceProvider.getOutput(), null);
    }
-   
+
    public void update() {
-	
+
    }
 
    /* (non-Javadoc)
@@ -110,6 +103,6 @@ public class XmlSecureStoreImpl implements SecStore{
     */
    @Override
    public void close() {
-	
+
    }
 }

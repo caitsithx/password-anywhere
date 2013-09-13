@@ -44,8 +44,8 @@ public class SecureStoreKeeperImpl implements SecureStoreKeeper {
 	return null;
    }
    
-   public void createNew(SecureStore p_data, char[] password, String fileLocation) {
-	secStorePersistManager.createNew(p_data, password, fileLocation);
+   public void createNew(SecureStore p_data, char[] password, String fileLocation) throws XmlSecureStoreException {
+	secStorePersistManager.createNew(p_data);
    }
 
    /*

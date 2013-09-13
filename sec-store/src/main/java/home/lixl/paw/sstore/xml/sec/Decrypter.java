@@ -18,27 +18,17 @@
  */
 package home.lixl.paw.sstore.xml.sec;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import home.lixl.paw.sstore.xml.impl.CipherWrapper;
+import home.lixl.paw.sstore.xml.util.XMLManager;
 
 import java.security.Key;
-
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESedeKeySpec;
+import java.util.List;
 
 import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.utils.JavaUtils;
 import org.apache.xml.security.utils.EncryptionConstants;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.OutputKeys;
+import org.w3c.dom.NodeList;
 
 /**
  * This sample demonstrates how to decrypt data inside an xml document.
@@ -47,106 +37,85 @@ import javax.xml.transform.OutputKeys;
  */
 public class Decrypter {
 
-    /** {@link org.apache.commons.logging} logging facility */
-    static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(
-            Decrypter.class.getName());
+   /** {@link org.apache.commons.logging} logging facility */
+   static org.apache.commons.logging.Log log = 
+	   org.apache.commons.logging.LogFactory.getLog(
+		   Decrypter.class.getName());
 
-    static {
-        org.apache.xml.security.Init.init();
-    }
+   static {
+	org.apache.xml.security.Init.init();
+   }
 
-    private static Document loadEncryptionDocument() throws Exception {
-        String fileName = "build/encryptedInfo.xml";
-        File encryptionFile = new File(fileName);
-        javax.xml.parsers.DocumentBuilderFactory dbf =
-            javax.xml.parsers.DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(encryptionFile);
-        System.out.println(
-            "Encryption document loaded from " + encryptionFile.toURI().toURL().toString()
-        );
-        return document;
-    }
+   CipherWrapper cipherWrapper = new CipherWrapper();
 
-    private static SecretKey loadKeyEncryptionKey() throws Exception {
-        String fileName = "build/kek";
-        String jceAlgorithmName = "DESede";
+   public void decryptAll(char[] p_password, final Document p_decXmlDocument) throws Exception {
 
-        File kekFile = new File(fileName);
+	/*
+	 * Load the key to be used for decrypting the xml data
+	 * encryption key.
+	 */
+	Key kek = cipherWrapper.getKey(p_password);
 
-        DESedeKeySpec keySpec =
-            new DESedeKeySpec(JavaUtils.getBytesFromFile(fileName));
-        SecretKeyFactory skf =
-             SecretKeyFactory.getInstance(jceAlgorithmName);
-        SecretKey key = skf.generateSecret(keySpec);
-         
-        System.out.println(
-            "Key encryption key loaded from " + kekFile.toURI().toURL().toString()
-        );
-        return key;
-    }
+	final XMLCipher xmlCipher = XMLCipher.getInstance();
+	/*
+	 * The key to be used for decrypting xml data would be obtained
+	 * from the keyinfo of the EncrypteData using the kek.
+	 */
+	xmlCipher.init(XMLCipher.DECRYPT_MODE, null);
+	xmlCipher.setKEK(kek);
 
-    private static void outputDocToFile(Document doc, String fileName) throws Exception {
-        File encryptionFile = new File(fileName);
-        FileOutputStream f = new FileOutputStream(encryptionFile);
-
-        TransformerFactory factory = TransformerFactory.newInstance();
-        Transformer transformer = factory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(f);
-        transformer.transform(source, result);
-
-        f.close();
-        System.out.println(
-            "Wrote document containing decrypted data to " + encryptionFile.toURI().toURL().toString()
-        );
-    }
-
-    public static void main(String unused[]) throws Exception {
-        Document document = loadEncryptionDocument();
-
-        Element encryptedDataElement =
-            (Element) document.getElementsByTagNameNS(
-                EncryptionConstants.EncryptionSpecNS,
-                EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
-
-        /*
-         * Load the key to be used for decrypting the xml data
-         * encryption key.
-         */
-        Key kek = loadKeyEncryptionKey();
-
-        String providerName = "BC";
-
-        XMLCipher xmlCipher =
-            XMLCipher.getInstance();
-        /*
-         * The key to be used for decrypting xml data would be obtained
-         * from the keyinfo of the EncrypteData using the kek.
-         */
-        xmlCipher.init(XMLCipher.DECRYPT_MODE, null);
-        xmlCipher.setKEK(kek);
-        /*
-         * The following doFinal call replaces the encrypted data with
-         * decrypted contents in the document.
-         */
-        xmlCipher.doFinal(document, encryptedDataElement);
-
-        outputDocToFile(document, "build/decryptedInfo.xml");
-    }
-
-   /**
-    * @param p_key
-    * @param p_l_encXmlDocument
-    * @return
-    * 
-    */
-   public Document decrypt(byte[] p_key, Document p_l_encXmlDocument) {
+//	 List<Element> l_folderElements = XMLManager.searchChildren(p_decXmlDocument.getDocumentElement(), "folder");
+//	   for (Element l_folderElement : l_folderElements) {
+//		searchAndDec(l_folderElement, new XMLManager.Action(){
+//
+//		   @Override
+//		   public void act(Element p_element) throws Exception {
+//			/*
+//			 * doFinal - "true" below indicates that we want to encrypt element's
+//			 * content and not the element itself. Also, the doFinal method would
+//			 * modify the document by replacing the EncrypteData element for the data
+//			 * to be encrypted.
+//			 */
+//			xmlCipher.doFinal(p_decXmlDocument, p_element);
+//		   }});
+//	   }
 	
-	return null;
+	 List<Element> l_folderElements = XMLManager.searchChildren(p_decXmlDocument.getDocumentElement(), "folder");
+	   for (Element l_folderElement : l_folderElements) {
+		searchAndDec(l_folderElement, new XMLManager.Action(){
+		   
+		   @Override
+		   public void act(Element p_element) throws Exception {
+			/*
+			 * doFinal - "true" below indicates that we want to encrypt element's
+			 * content and not the element itself. Also, the doFinal method would
+			 * modify the document by replacing the EncrypteData element for the data
+			 * to be encrypted.
+			 */
+			xmlCipher.doFinal(p_decXmlDocument, p_element);
+		   }});
+	   }
+	
+   }
+
+   /**
+    * @param p_folderElement
+    * @throws Exception 
+    * 
+    */
+   private void searchAndDec(Element p_folderElement, XMLManager.Action p_action) throws Exception {
+	NodeList l_encElementsList = p_folderElement.getElementsByTagNameNS(
+		EncryptionConstants.EncryptionSpecNS, 
+		EncryptionConstants._TAG_ENCRYPTEDDATA);
+
+	if(l_encElementsList.getLength() == 0) {
+	   List<Element> l_folderElements = XMLManager.searchChildren(p_folderElement, "folder");
+	   for (Element l_folderElement : l_folderElements) {
+		searchAndDec(l_folderElement, p_action);
+	   }
+	} else {
+	   p_action.act((Element)l_encElementsList.item(0));
+	}
    }
 
    /**
@@ -155,8 +124,9 @@ public class Decrypter {
     * @return
     * 
     */
-   public Document decryptAll(byte[] p_key, Document p_l_encXmlDocument) {
-	// TODO Auto-generated method stub
+   public Document decrypt(char[] p_key, Document p_l_encXmlDocument) {
+
 	return null;
    }
+
 }
