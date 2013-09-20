@@ -7,12 +7,13 @@
 //
 // Original author: lixl
 // -------------------------------------------------------------------------
-package home.lixl.paw.sstore.xml;
+package home.lixl.paw.store;
 
 /**
  *
  * 
  */
-public interface ReadWriteAccessAction {
+public enum ModifyGroupAction {
 
+   ADD, UPDATE, DELETE, SUB
 }

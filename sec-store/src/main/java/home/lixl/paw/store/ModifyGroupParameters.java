@@ -7,15 +7,20 @@
 //
 // Original author: lixl
 // -------------------------------------------------------------------------
-package home.lixl.paw.sstore;
+package home.lixl.paw.store;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * 
  */
-public interface CipherAlgorithm {
+public final class ModifyGroupParameters {
 
-   String getJCEName();
-   String getXmlCipherURI();
-   int getKeySize();
+   public HashMap<String, ModifyGroupData> parameters = new HashMap<>();
+   
+   public final Map<String, ModifyGroupData> getParameters() {
+	return this.parameters;
+   }
 }

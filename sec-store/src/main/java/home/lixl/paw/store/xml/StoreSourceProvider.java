@@ -7,7 +7,7 @@
 //
 // Original author: lixl
 // -------------------------------------------------------------------------
-package home.lixl.paw.sstore.xml;
+package home.lixl.paw.store.xml;
 
 import javax.xml.transform.Result;
 

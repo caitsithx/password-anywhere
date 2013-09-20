@@ -7,12 +7,12 @@
 //
 // Original author: lixl
 // -------------------------------------------------------------------------
-package home.lixl.paw.sstore.impl;
+package home.lixl.paw.store.impl;
 
-import home.lixl.paw.sstore.SecStore;
-import home.lixl.paw.sstore.SecureStoreKeeper;
-import home.lixl.paw.sstore.xml.XmlSecureStoreException;
 import home.lixl.paw.sstore.xml.plain.SecureStore;
+import home.lixl.paw.store.Store;
+import home.lixl.paw.store.SecureStoreKeeper;
+import home.lixl.paw.store.xml.XmlSecureStoreException;
 
 /**
  *
@@ -20,7 +20,7 @@ import home.lixl.paw.sstore.xml.plain.SecureStore;
  */
 public class SecureStoreKeeperImpl implements SecureStoreKeeper {
 
-   private SecStore secStorePersistManager;
+   private Store secStorePersistManager;
 
    protected void open() {
 	if (secStorePersistManager == null) {
@@ -39,7 +39,7 @@ public class SecureStoreKeeperImpl implements SecureStoreKeeper {
     * @return
     * 
     */
-   private SecStore createSecStorePersistence() {
+   private Store createSecStorePersistence() {
 	// TODO Auto-generated method stub
 	return null;
    }

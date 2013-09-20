@@ -7,20 +7,20 @@
 //
 // Original author: lixl
 // -------------------------------------------------------------------------
-package home.lixl.paw.sstore;
+package home.lixl.paw.store;
 
 import javax.xml.bind.JAXBException;
 
 import org.w3c.dom.Document;
 
-import home.lixl.paw.sstore.xml.XmlSecureStoreException;
 import home.lixl.paw.sstore.xml.plain.SecureStore;
+import home.lixl.paw.store.xml.XmlSecureStoreException;
 
 /**
  *
  * 
  */
-public interface SecStore {
+public interface Store {
 
    /**
     * @return 

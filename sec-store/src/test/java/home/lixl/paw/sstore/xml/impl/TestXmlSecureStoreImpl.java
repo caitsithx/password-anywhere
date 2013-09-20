@@ -9,12 +9,12 @@
 // -------------------------------------------------------------------------
 package home.lixl.paw.sstore.xml.impl;
 
-import home.lixl.paw.sstore.xml.JaxbHandler;
-import home.lixl.paw.sstore.xml.StorageKeyKeeper;
-import home.lixl.paw.sstore.xml.StoreSourceProvider;
 import home.lixl.paw.sstore.xml.plain.SecureStore;
+import home.lixl.paw.store.xml.JaxbHandler;
+import home.lixl.paw.store.xml.StorageKeyKeeper;
+import home.lixl.paw.store.xml.StoreSourceProvider;
+import home.lixl.paw.store.xml.impl.XmlStoreImpl;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
@@ -35,7 +35,7 @@ public class TestXmlSecureStoreImpl {
 
    @Test
    public void testLoad() throws Exception {
-	XmlSecureStoreImpl l_secStore = new XmlSecureStoreImpl();
+	XmlStoreImpl l_secStore = new XmlStoreImpl();
 	
 	l_secStore.init(new StorageKeyKeeper() {
 	   
@@ -82,7 +82,7 @@ public class TestXmlSecureStoreImpl {
    
    @Test
    public void testLoad1() throws Exception {
-	XmlSecureStoreImpl l_secStore = new XmlSecureStoreImpl();
+	XmlStoreImpl l_secStore = new XmlStoreImpl();
 	
 	l_secStore.init(new StorageKeyKeeper() {
 	   
@@ -109,19 +109,14 @@ public class TestXmlSecureStoreImpl {
 	   
 	   @Override
 	   public InputSource getInput() {
-		try {
-		   return new InputSource(new FileInputStream("target/enc.xml"));
-		} catch (FileNotFoundException ex) {
-		   ex.printStackTrace();
-		   return null;
-		}
+		return new InputSource(TestXmlSecureStoreImpl.class.getResourceAsStream("/plainstore.xml"));
 	   }
 	});
 	
-	DocumentBuilder dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	Document l_doc = dbuilder.parse(TestXmlSecureStoreImpl.class.getResourceAsStream("/plainstore.xml"));
-	SecureStore l_store = JaxbHandler.loadJAXB(l_doc);
-	System.out.println(l_store);
+//	DocumentBuilder dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+//	Document l_doc = dbuilder.parse();
+//	SecureStore l_store = JaxbHandler.loadJAXB(l_doc);
+//	System.out.println(l_store);
 	
 	SecureStore l_sstore = l_secStore.list();
 	System.out.println(l_sstore);	

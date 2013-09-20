@@ -16,18 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package home.lixl.paw.sstore.xml.sec;
+package home.lixl.paw.store.xml.crypto;
 
-import home.lixl.paw.sstore.xml.XmlSecureStoreException;
-import home.lixl.paw.sstore.xml.impl.CipherWrapper;
-import home.lixl.paw.sstore.xml.util.XMLManager;
+import home.lixl.paw.store.xml.XmlSecureStoreException;
+import home.lixl.paw.store.xml.util.XMLManager;
 
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
@@ -52,12 +47,7 @@ public class Encrypter {
 	org.apache.xml.security.Init.init();
    }
 
-   private SecretKey GenerateDataEncryptionKey() throws NoSuchAlgorithmException {
-	String jceAlgorithmName = "AES";
-	KeyGenerator keyGenerator = KeyGenerator.getInstance(jceAlgorithmName);
-	keyGenerator.init(128);
-	return keyGenerator.generateKey();
-   }
+
 
    /**
     * @param p_key
@@ -68,40 +58,22 @@ public class Encrypter {
 	return null;
    }
 
-   CipherWrapper cipherWrapper = new CipherWrapper();
+   XmlCiphers cipherWrapper = new DESedeAESCiphers();
 
 
    /**
-    * @param p_key
+    * @param p_password
     * @param p_decXmlDocument
-    * @return
     * @throws XmlSecureStoreException 
     * 
     */
-   public void encryptAllWithNewKey(char[] p_key, final Document p_decXmlDocument) throws XmlSecureStoreException {
+   public void encryptAllWithNewKey(char[] p_password, final Document p_decXmlDocument) throws XmlSecureStoreException {
 	try {
 
-	   /*
-	    * Get a key to be used for encrypting the element. Here we are generating
-	    * an AES key.
-	    */
-	   Key symmetricKey = GenerateDataEncryptionKey();
+	   EncryptionCiphers ciphers = cipherWrapper.forEncryption(p_password, p_decXmlDocument);
 
-	   /*
-	    * Get a key to be used for encrypting the symmetric key. Here we are
-	    * generating a DESede key.
-	    */
-	   Key kek = cipherWrapper.getKey(p_key);
-
-	   EncryptedKey encryptedKey = encryptDataKey(kek, symmetricKey, p_decXmlDocument);
-
-
-	   /*
-	    * Let us encrypt the contents of the document element.
-	    */
-	   String algorithmURI = XMLCipher.AES_128;
-	   final XMLCipher xmlCipher = XMLCipher.getInstance(algorithmURI);
-	   xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+	   EncryptedKey encryptedKey = ciphers.getEncryptedKey();
+	   final XMLCipher xmlCipher = ciphers.getEncryptionCipher();
 
 	   /*
 	    * Setting keyinfo inside the encrypted data being prepared.
@@ -114,7 +86,7 @@ public class Encrypter {
 
 
 
-	   List<Element> l_folderElements = XMLManager.searchChildren(rootElement, "folder");
+	   List<Element> l_folderElements = XMLManager.searchChildren(rootElement, "group");
 	   for (Element l_folderElement : l_folderElements) {
 		searchAndEncPairs(l_folderElement, new XMLManager.Action(){
 
@@ -135,23 +107,6 @@ public class Encrypter {
    }
 
    /**
-    * @param p_symmetricKey 
-    * @param p_kek 
-    * @param p_decXmlDocument 
-    * @return
-    * @throws XMLEncryptionException 
-    * 
-    */
-   private EncryptedKey encryptDataKey(Key p_kek, Key p_symmetricKey, Document p_decXmlDocument) throws XMLEncryptionException {
-	String algorithmURI = XMLCipher.TRIPLEDES_KeyWrap;
-	XMLCipher keyCipher = XMLCipher.getInstance(algorithmURI);
-	keyCipher.init(XMLCipher.WRAP_MODE, p_kek);
-
-	return keyCipher.encryptKey(p_decXmlDocument,
-		p_symmetricKey);
-   }
-
-   /**
     * @param p_decXmlDocument 
     * @param p_xmlCipher 
     * @param p_folderElement
@@ -164,7 +119,7 @@ public class Encrypter {
 	if(l_pairCount > 0) {
 	   p_encAction.act(p_folderElement);
 	} else {
-	   List<Element> l_folderElements = XMLManager.searchChildren(p_folderElement, "folder");
+	   List<Element> l_folderElements = XMLManager.searchChildren(p_folderElement, "group");
 
 	   for (Element l_folderElement : l_folderElements) {
 		searchAndEncPairs(l_folderElement, p_encAction);

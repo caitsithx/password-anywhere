@@ -7,7 +7,7 @@
 //
 // Original author: lixl
 // -------------------------------------------------------------------------
-package home.lixl.paw.sstore;
+package home.lixl.paw.store;
 
 import java.security.Key;
 

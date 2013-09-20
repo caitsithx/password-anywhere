@@ -10,6 +10,7 @@
 package home.lixl.paw.sstore.xml;
 
 import home.lixl.paw.sstore.xml.plain.SecureStore;
+import home.lixl.paw.store.xml.JaxbHandler;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;

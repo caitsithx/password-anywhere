@@ -7,13 +7,12 @@
 //
 // Original author: lixl
 // -------------------------------------------------------------------------
-package home.lixl.paw.sstore;
+package home.lixl.paw.store.xml;
 
 /**
  *
  * 
  */
-public class SecureStoreManager {
+public interface XmlSecureStoreAccessAction {
 
-   
 }

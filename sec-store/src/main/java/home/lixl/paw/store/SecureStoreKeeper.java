@@ -7,12 +7,17 @@
 //
 // Original author: lixl
 // -------------------------------------------------------------------------
-package home.lixl.paw.sstore.xml;
+package home.lixl.paw.store;
 
 /**
  *
  * 
  */
-public interface ReadOnlyAccessAction {
+public interface SecureStoreKeeper {
 
+   public void persist();
+   public void update();
+   public void find();
+   public void remove();
+   
 }

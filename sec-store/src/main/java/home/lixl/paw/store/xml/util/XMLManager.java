@@ -1,9 +1,9 @@
 /**
  * 
  */
-package home.lixl.paw.sstore.xml.util;
+package home.lixl.paw.store.xml.util;
 
-import home.lixl.paw.sstore.xml.XmlSecureStoreException;
+import home.lixl.paw.store.xml.XmlSecureStoreException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,6 +29,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,6 +71,21 @@ public final class XMLManager {
 	}
 
 	return l_appElement;
+   }
+   
+   public static Element selectChildByAttr(Element p_element, String p_childName, String p_attrName, String p_attrVal) throws XmlSecureStoreException {
+	   XPathFactory xPathFactory = XPathFactory.newInstance();
+	   XPath l_groupPath = xPathFactory.newXPath();
+	   
+	   String l_xPathString = String.format("//child::%1s[@%2s='%3s']",
+		   p_childName, p_attrName, p_attrVal);
+	   try {
+		XPathExpression l_xpathExp = l_groupPath.compile(l_xPathString);
+		return (Element) l_xpathExp.evaluate(p_element,
+			XPathConstants.NODE);
+	   } catch (XPathExpressionException ex) {
+		throw new XmlSecureStoreException(ex);
+	   }
    }
 
    /**

@@ -7,12 +7,18 @@
 //
 // Original author: lixl
 // -------------------------------------------------------------------------
-package home.lixl.paw.sstore.xml;
+package home.lixl.paw.store.xml.crypto;
+
+import org.apache.xml.security.encryption.EncryptedKey;
+import org.apache.xml.security.encryption.XMLCipher;
 
 /**
  *
  * 
  */
-public interface XmlSecureStoreAccessAction {
+public interface EncryptionCiphers {
 
+   XMLCipher getEncryptionCipher();
+   EncryptedKey getEncryptedKey();
+   
 }

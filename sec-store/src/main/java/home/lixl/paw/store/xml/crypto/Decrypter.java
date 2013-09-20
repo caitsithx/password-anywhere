@@ -16,10 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package home.lixl.paw.sstore.xml.sec;
+package home.lixl.paw.store.xml.crypto;
 
-import home.lixl.paw.sstore.xml.impl.CipherWrapper;
-import home.lixl.paw.sstore.xml.util.XMLManager;
+import home.lixl.paw.store.xml.util.XMLManager;
 
 import java.security.Key;
 import java.util.List;
@@ -46,23 +45,10 @@ public class Decrypter {
 	org.apache.xml.security.Init.init();
    }
 
-   CipherWrapper cipherWrapper = new CipherWrapper();
+   XmlCiphers cipherWrapper = new DESedeAESCiphers();
 
    public void decryptAll(char[] p_password, final Document p_decXmlDocument) throws Exception {
-
-	/*
-	 * Load the key to be used for decrypting the xml data
-	 * encryption key.
-	 */
-	Key kek = cipherWrapper.getKey(p_password);
-
-	final XMLCipher xmlCipher = XMLCipher.getInstance();
-	/*
-	 * The key to be used for decrypting xml data would be obtained
-	 * from the keyinfo of the EncrypteData using the kek.
-	 */
-	xmlCipher.init(XMLCipher.DECRYPT_MODE, null);
-	xmlCipher.setKEK(kek);
+	final XMLCipher xmlCipher = cipherWrapper.forDecryption(p_password);
 
 //	 List<Element> l_folderElements = XMLManager.searchChildren(p_decXmlDocument.getDocumentElement(), "folder");
 //	   for (Element l_folderElement : l_folderElements) {

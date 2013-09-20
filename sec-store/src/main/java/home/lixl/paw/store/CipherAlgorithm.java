@@ -7,17 +7,15 @@
 //
 // Original author: lixl
 // -------------------------------------------------------------------------
-package home.lixl.paw.sstore;
+package home.lixl.paw.store;
 
 /**
  *
  * 
  */
-public interface SecureStoreKeeper {
+public interface CipherAlgorithm {
 
-   public void persist();
-   public void update();
-   public void find();
-   public void remove();
-   
+   String getJCEName();
+   String getXmlCipherURI();
+   int getKeySize();
 }
