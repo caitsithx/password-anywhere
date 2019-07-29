@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SecureDocument>
+    <Group>
+        <Pair>
+            <Name>name</Name>
+            <Value>value</Value>
+        </Pair>
+    </Group>
+    <Group>
+        <Pair>
+            <Name>name</Name>
+            <Value>value</Value>
+        </Pair>
+    </Group>
+</SecureDocument>

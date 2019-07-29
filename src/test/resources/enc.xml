@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<SecureDocument>
+    <Group>
+        <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Type="http://www.w3.org/2001/04/xmlenc#Content">
+            <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<xenc:EncryptedKey>
+                    <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#kw-tripledes"/>
+                    <xenc:CipherData>
+                        <xenc:CipherValue>BSQ7wQGkvfX8uVwjb0ZquB5KjsvytEluDFUDUrq5bFo=</xenc:CipherValue>
+                    </xenc:CipherData>
+                </xenc:EncryptedKey>
+            </ds:KeyInfo>
+            <xenc:CipherData>
+                <xenc:CipherValue>C5c91ssqCLY2MBPzjGuieOJcnnKgVgcT+qkCsX94fJHG7frsUIgUc9Ers8LHLkQD16Cau5wCGfs5&#13;
+Qokmi2i276dg+iqXPZTcS4NxZ7GsfnQ=</xenc:CipherValue>
+            </xenc:CipherData>
+        </xenc:EncryptedData>
+    </Group>
+    <Group>
+        <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Type="http://www.w3.org/2001/04/xmlenc#Content">
+            <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<xenc:EncryptedKey>
+                    <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#kw-tripledes"/>
+                    <xenc:CipherData>
+                        <xenc:CipherValue>BSQ7wQGkvfX8uVwjb0ZquB5KjsvytEluDFUDUrq5bFo=</xenc:CipherValue>
+                    </xenc:CipherData>
+                </xenc:EncryptedKey>
+            </ds:KeyInfo>
+            <xenc:CipherData>
+                <xenc:CipherValue>EijNyY6lOvyk4qhdkQImtf0lSuIlKfsLOEndV8/PvXQA7IsGChe1S7dAw4LToBbZS7A6Tzwpci18&#13;
+XIYAbnxMxdbN8YwNBQdpDBDxfsGC0yA=</xenc:CipherValue>
+            </xenc:CipherData>
+        </xenc:EncryptedData>
+    </Group>
+</SecureDocument>
