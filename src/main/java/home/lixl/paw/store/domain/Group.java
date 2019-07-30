@@ -9,6 +9,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Group")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Group {
+    @XmlElement(name = "Id")
+    private String Id;
+
     public List<Pair> getPairs() {
         return pairs;
     }
@@ -19,4 +22,12 @@ public class Group {
 
     @XmlElement(name = "Pair")
     private List<Pair> pairs;
+
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        Id = id;
+    }
 }

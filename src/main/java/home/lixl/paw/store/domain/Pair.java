@@ -8,6 +8,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Pair")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Pair {
+    @XmlElement(name = "Name")
+    private String name;
+    @XmlElement(name = "Value")
+    private String value;
+
     public String getName() {
         return name;
     }
@@ -23,9 +28,4 @@ public class Pair {
     public void setValue(String value) {
         this.value = value;
     }
-
-    @XmlElement(name = "Name")
-    private String name;
-    @XmlElement(name = "Value")
-    private String value;
 }

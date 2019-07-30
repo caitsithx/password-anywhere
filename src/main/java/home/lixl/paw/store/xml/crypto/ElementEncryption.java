@@ -9,16 +9,13 @@
 // -------------------------------------------------------------------------
 package home.lixl.paw.store.xml.crypto;
 
-import org.apache.xml.security.encryption.EncryptedKey;
-import org.apache.xml.security.encryption.XMLCipher;
+import org.w3c.dom.Element;
 
 /**
  *
- * 
+ *
+ * @author xili
  */
-public interface EncryptionCiphers {
-
-   XMLCipher getEncryptionCipher();
-   EncryptedKey getEncryptedKey();
-   
+public interface ElementEncryption {
+   void encrypt(Element element);
 }

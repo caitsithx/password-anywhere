@@ -13,7 +13,7 @@ package home.lixl.paw.store.xml;
  *
  * 
  */
-public class XmlSecureStoreException extends Exception {
+public class XmlSecureStoreException extends RuntimeException {
 
    /**
     * 

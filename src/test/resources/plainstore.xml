@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SecureDocument>
     <Group>
-        <Pair>
+        <Pair Label="123">
+            <Name>name</Name>
+            <Value>value</Value>
+        </Pair>
+        <Pair Label="123">
             <Name>name</Name>
             <Value>value</Value>
         </Pair>
     </Group>
     <Group>
-        <Pair>
+        <Pair Label="123">
             <Name>name</Name>
             <Value>value</Value>
         </Pair>
